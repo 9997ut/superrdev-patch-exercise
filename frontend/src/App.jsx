@@ -9,6 +9,19 @@ export default function App() {
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
 
+  // BUG FIX: Reset page to 1 whenever the query or status filter changes.
+  // Without this, changing a filter while on e.g. page 3 would show 0 results
+  // even though matches exist on page 1.
+  function handleQueryChange(val) {
+    setQuery(val);
+    setPage(1);
+  }
+
+  function handleStatusChange(val) {
+    setStatus(val);
+    setPage(1);
+  }
+
   const { tasks, total, loading, error } = useTasks(query, status, page, 10);
 
   const totalPages = Math.ceil(total / 10);
@@ -21,8 +34,8 @@ export default function App() {
       </header>
 
       <div className="controls">
-        <SearchBar value={query} onChange={setQuery} />
-        <StatusFilter value={status} onChange={setStatus} />
+        <SearchBar value={query} onChange={handleQueryChange} />
+        <StatusFilter value={status} onChange={handleStatusChange} />
       </div>
 
       <TaskTable tasks={tasks} loading={loading} error={error} />
